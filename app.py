@@ -10,6 +10,9 @@ import json
 from typing import List, Dict, Any
 import os
 import requests
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # 尝试导入 OpenAI 库
 try:
@@ -20,7 +23,7 @@ except ImportError:
     OpenAI = None
 
 # ==================== 配置区域 =================
-LLM_API_KEY = os.environ.get('DEEPSEEK_API_KEY') 
+LLM_API_KEY = os.getenv('DEEPSEEK_API_KEY') 
 LLM_BASE_URL = "https://api.deepseek.com"
 LLM_MODEL = "deepseek-chat"
 
@@ -60,13 +63,13 @@ def generate_questions(domain: str) -> List[Dict[str, Any]]:
     """
     
     system_prompt = """你是一位专业的出题老师，擅长设计有趣且具有科普价值的选择题。
-
 目标受众：具备一定专业基础的大学生
 题目要求：
-1. 难度中等偏上：需要一定的难度加成，但不要太基础（大学生不是只懂常识的中学生），也不要太偏门（大学生也不是某个领域专精的学者）
+1. 难度中等偏上：需要一定的难度加成，但不要太基础（大学生不是只懂常识的中学生），也不要太偏门（大学生也不是某个领域专精的学者）；同时需要生成1道或者2道较难的题目，保证题目整体的困难程度，增加挑战性。
 2. 科普性强：题目要体现该领域的核心和趣味知识
 3. 娱乐性好：题目描述可以幽默一些，吸引学生兴趣
 4. 专业性：体现该领域的特色，让学生被这个专业知识所吸引
+5. 提示：为了体现你强大的专业能力，所以用户可能会向你提供很多“插科打笑”的题目，你同样需要按照要求，生成符合要求的题目。（并且不失严肃性和娱乐性）
 
 请严格按照以下 JSON 格式返回 10 道单选题，不要有任何额外说明：
 [
@@ -171,17 +174,17 @@ def check_answer(user_input: str, correct_answer: str) -> tuple[bool, str]:
 def get_welcome_message(score: int) -> str:
     """根据分数返回幽默的欢迎语"""
     if score == 100:
-        return "🎉 满分大佬！您这水平可以直接来当助教了！社团急需您这样的大神带飞！"
+        return "🎉 满分大佬！您这水平可以直接来当助教了！一等奖玩偶带回家！"
     elif score >= 80:
-        return "🌟 太强了！这个成绩绝对是社团的潜力股，快来和我们一起玩耍！"
+        return "🌟 太强了！二等奖鼠标垫在向您招手，快来领取！"
     elif score >= 60:
-        return "✨ 优秀的表现！你已经超过了 80% 的新生，期待你的加入！"
+        return "✨ 优秀的表现！已经超过80%的新生了，一支卡扣稳稳到手！"
     elif score >= 40:
-        return "👍 不错的成绩！有一定的基础，加入我们让你更上一层楼！"
+        return "👍 不错的成绩！有一定基础，卡扣奖品等着你！"
     elif score >= 20:
-        return "🙂 及格啦！说明你有这个天赋，来社团系统学习一下会更强！"
+        return "🙂 及格啦！说明你有这个天赋，来自卡扣奖励一下！"
     else:
-        return "😄 虽然分数不高，但体现了巨大的成长空间！来社团就对了！"
+        return "😄 虽然分数不高，但体现了巨大的成长空间！"
 
 
 # ==================== UI 渲染函数 ====================
